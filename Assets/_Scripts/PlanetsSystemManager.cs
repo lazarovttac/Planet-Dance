@@ -32,7 +32,6 @@ public class PlanetsSystemManager : MonoBehaviour
     void Start()
     {
         tSlider.onValueChanged.AddListener (delegate {tChanged ();});
-        StartCoroutine(InitialReset());
     }
 
     void Update()
@@ -58,23 +57,15 @@ public class PlanetsSystemManager : MonoBehaviour
         timeScale = tSlider.value;
         Time.timeScale = timeScale;
     }
-
-    IEnumerator InitialReset() {
-        yield return new WaitForSeconds(0.5f);
-        RestartTrails();
-    }
-
-    public void RestartTrails() {
-        foreach (Planet planet in planets) {
-            planet.script.trail.Clear();
-        }
-    }
-
     
     public void CreateNewPlanet() {
-        Transform parent = planets[planets.Count - 1].script.gameObject.transform;
+        Transform parent = null;
         
-        GameObject planetObject = Instantiate(planetPrefab, parent.position, Quaternion.identity);
+        if(planets.Count - 1 >= 0) {
+            parent = planets[planets.Count - 1].script.gameObject.transform;
+        } 
+        
+        GameObject planetObject = Instantiate(planetPrefab, Vector3.zero, Quaternion.identity);
         planetObject.transform.SetParent(parent);
         GameObject planetSettingsObject = Instantiate(planetSettingsPrefab, Vector3.zero, Quaternion.identity, planetSettingsParent);
         
@@ -85,5 +76,29 @@ public class PlanetsSystemManager : MonoBehaviour
         newPlanet.settings.planetName = (planets.Count + 1) + "° Planet";
 
         planets.Add(newPlanet);
+        ResetPositions();
+    }
+
+    public void DeleteLastPlanet() {
+        int index = planets.Count - 1;
+
+        Destroy(planets[index].script.gameObject);
+        Destroy(planets[index].settings.gameObject);
+
+        planets.RemoveAt(index);
+    }
+
+    
+    public void RestartTrails() {
+        foreach (Planet planet in planets) {
+            planet.script.trail.Clear();
+        }
+    }
+
+    public void ResetPositions() {
+        foreach (Planet planet in planets) {
+            planet.script.angle = 0;
+            StartCoroutine(planet.script.InitialReset());
+        }
     }
 }

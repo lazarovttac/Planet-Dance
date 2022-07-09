@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public class OrbitAround : MonoBehaviour
@@ -8,6 +9,10 @@ public class OrbitAround : MonoBehaviour
     public float angle = 0;
     public float w = 2; // Angular velocity in radians/s
     public TrailRenderer trail;
+
+    void Start() {
+        StartCoroutine(InitialReset());
+    }
 
     void Update()
     {
@@ -34,4 +39,10 @@ public class OrbitAround : MonoBehaviour
         // radius =  ((a*a) + (b*b)) / ((2 * a * Mathf.Cos(angle)) + (2 * b * Mathf.Sin(angle)));
         // radius = r + 2 * a * Mathf.Cos(angle) + 2 * b * Mathf.Sin(angle);
     }
+
+    public IEnumerator InitialReset() {
+        yield return new WaitForSeconds(0.1f);
+        trail.Clear();
+    }
+
 }
